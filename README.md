@@ -25,5 +25,6 @@ Abdinasir Yussuf
 - ### run npm I or npm Install to download all dependencies
 - ### Clone repo and run  `node caps.js` in the console
 
+
 # UML
-![CAPS](../caps/img/capsUML.png)
+![CAPS](/img/capsUML.png)
