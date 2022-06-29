@@ -3,31 +3,36 @@
 
 const { Server } = require('socket.io');
 
-const PORT = process.env.PORT || 3002
+const PORT = process.env.PORT || 3002;
 
 
 const server = new Server(PORT);
 
+const caps = server.of('/caps');
 
-server.on('connection',(socket)=>{
-  console.log('Successfully connected to Sever!!!',socket.id)
-  socket.on('PICKUP', (payload) => {
-    console.log('Server PICKUP event ', payload);
-    // socket.emit('MESSAGE', payload); // send this to the same socket that emitted
-    // server.emit('MESSAGE', payload);  //send to all connected sockets
-    socket.broadcast.emit('PICKUP', payload); // send to all sockets except sender
+
+caps.on('connection',(socket)=>{
+  console.log('Successfully connected to Caps!!!',socket.id);
+  socket.on('JOIN', (room) => {
+    console.log(`You've joined the ${room} room!`);
+    socket.join(room);
   });
   
+  
+  socket.on('ORDER', (payload) => {
+    logEvent('ORDER',payload);
+    socket.broadcast.emit('ORDER', payload); 
+  });
+
+  
   socket.on('IN-TRANSIT', (payload) => {
-    console.log('Server IN-TRANSIT event ', payload);
-    // socket.emit('MESSAGE', payload); // send this to the same socket that emitted
-    // server.emit('MESSAGE', payload);  //send to all connected sockets
-    socket.broadcast.emit('IN-TRANSIT', payload); // send to all sockets except sender
+    logEvent('IN-TRANSIT',payload);
+    caps.to(payload.store).emit('IN-TRANSIT', payload); 
   });
 
   socket.on('DELIVERED', (payload) => {
-    console.log('Server DELIVERED event ', payload);
-    socket.broadcast.emit('DELIVERED', payload);
+    logEvent('DELIVERED',payload);
+    caps.to(payload.store).emit('DELIVERED', payload); 
   });
 });
 

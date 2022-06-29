@@ -1,24 +1,27 @@
 'use strict';
-
+const packageReceived = require('./handleVendor/index');
 const Chance = require('chance');
 const chance = new Chance();
 
 const { io } = require('socket.io-client');
 
 // acknowledge a connection, no subscriptions have occurred yet
-const socket = io('http://localhost:3002');
+const socket = io('http://localhost:3002/caps');
 
+let storeName = '1-206-flowers';
+socket.emit('JOIN', storeName);
 
-console.log('hello this vendor')
-
-
-const handleReceived = require('./handleReceived');
-const sendMessage = createSendMessage(socket);
-
-socket.on('RECEIVED', handleReceived);
+// socket.on('ORDER', readyForPickup);
+socket.on('DELIVERED', packageReceived);
 
 setInterval(() => {
-  sendMessage(`Hi ${chance.first()}`);
+  let order = {
+    store: storeName,
+    orderId: chance.guid(),
+    customer: chance.name(),
+    address: chance.address()
+  };
+  socket.emit('ORDER',order);
 }, 3000);
 
 
