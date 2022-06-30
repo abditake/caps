@@ -3,13 +3,13 @@ const PORT = process.env.PORT || 3000;
 const Queue = require('../lib/queue.js');
 const Log = require('../lib/logger.js');
 
-const io = new Server(PORT);
+const server = new Server(PORT);
 const messageQueue = new Queue();
-const server = io.of('/caps');
+const caps = server.of('/caps');
 
 
 
-server.on('connection', socket => {
+caps.on('connection', socket => {
   console.log('Starting up CAPS...' + socket.id);
 
   socket.on('join', ({ queueId }) => {
@@ -29,7 +29,7 @@ server.on('connection', socket => {
 
     let message = currentQueue.remove(payload.messageId);
     console.log(log);
-    server.emit('ORDER_RECEIVED', message);
+    caps.emit('ORDER_RECEIVED', message);
   });
 
   socket.on('PICKUP_REQUESTED', (payload) => {
@@ -40,7 +40,7 @@ server.on('connection', socket => {
 
     let log = new Log('SCHEDULED FOR PICKUP', payload);
     console.log(log);
-    server.emit('PICKUP_REQUESTED', payload);
+    caps.emit('PICKUP_REQUESTED', payload);
   });
 
   socket.on('IN_TRANSIT', (payload) => {
@@ -51,7 +51,7 @@ server.on('connection', socket => {
     }
     let log = new Log('IN-TRANSIT', payload);
     console.log(log);
-    server.emit('IN_TRANSIT', payload);
+    caps.emit('IN_TRANSIT', payload);
   });
   
   socket.on('DELIVERED', (payload) => {
@@ -61,6 +61,6 @@ server.on('connection', socket => {
     }
     let log = new Log('DELIVERED', payload);
     console.log(log);
-    server.emit('DELIVERY_CONFIRMED', payload);
+    caps.emit('DELIVERY_CONFIRMED', payload);
   });
 });
