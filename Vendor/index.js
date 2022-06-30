@@ -1,28 +1,33 @@
 'use strict';
-const eventPool = require('../eventPool');
-const Chance = require('chance');
-const chance = new Chance();
 
+const MessageClient = require('../lib/messageClient.js')
+const chance = require('../lib/chance');
 
-eventPool.on('DELIVERED', delivered);
+const messageQueue = new MessageClient('pickup')
 
 let storeName = chance.company();
 
 
-
-function delivered(payload) {
-  console.log(`VENDOR: Thank you for delivering order ${payload.orderId} `);
+setInterval(async () => {
+ let order = {
+  payload: {
+    store: storeName,
+    orderID: chance.guid(),
+    customer: chance.name(),
+    address: chance.address()
+  }
 }
 
-
-let order = {
-  store: storeName,
-  orderId: chance.guid(),
-  customer: chance.name(),
-  address: chance.address()
-};
+  messageQueue.publish('ORDER_RECEIVED', order);
+  console.log('Customer order received with orderID ',order.payload.orderID);
+}, 20000);
 
 
-setInterval(() => {
-  eventPool.emit('PICKUP', order);
-}, 3000);
+messageQueue.subscribe('ORDER_RECEIVED', (payload) => {
+  messageQueue.publish('PICKUP_REQUESTED', payload);
+  console.log(`${payload.payload.store}: Order with ${payload.payload.orderID} has been PICKED UP`)
+});
+
+messageQueue.subscribe('DELIVERY_CONFIRMED', (payload) => {
+  console.log(`${payload.payload.store} delivery with orderID:${payload.payload.orderID} confirmed. Thank you!`)
+})
