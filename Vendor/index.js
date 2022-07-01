@@ -1,5 +1,5 @@
 'use strict';
-const packageReceived = require('./handleVendor/index');
+const { packageReceived } = require('./handleVendor/index');
 const Chance = require('chance');
 const chance = new Chance();
 

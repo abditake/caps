@@ -12,7 +12,7 @@ const caps = server.of('/caps');
 
 
 caps.on('connection',(socket)=>{
-  console.log('Successfully connected to Caps!!!',socket.id);
+  console.log('Successfully connected to Caps!!!', socket.id);
   socket.on('JOIN', (room) => {
     console.log(`You've joined the ${room} room!`);
     socket.join(room);
