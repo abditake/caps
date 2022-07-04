@@ -1,8 +1,8 @@
 'use strict';
 
-const MessageClient = require('../lib/messageClient.js');
+const MessageClient = require('../lib/messageClient');
 
-const messageQueue = new MessageClient('delivery');
+const messageQueue = new MessageClient('driver');
 
 
 messageQueue.subscribe('PICKUP_REQUESTED', (payload) => {
